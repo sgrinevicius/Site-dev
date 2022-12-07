@@ -1,8 +1,167 @@
-<!DOCTYPE html>
 <html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* Dotted red border */
+hr.new3 {
+  border-top: 1px dotted red;
+}
+
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () 
+{
+  var switch1 = document.querySelector('input[id="switch1"]');
+  switch1.addEventListener('change', function () {
+    if (switch1.checked) {
+      // do this
+      console.log('switch1 Checked');
+      sendData("sw1", 1);
+    } else {
+      // do that
+      console.log('switch1 Not checked');
+      sendData("sw1", 0);
+    }
+  });
+});
+</script> 
+
+</head>
 <body>
+<div align="center"><img src="logo.png" alt="logo" width="150" height="40"  /></div>
+<table >
+    <tr>
+        <td width="20%">
+           <label class="switch">
+               <input type="checkbox" id="switch1">
+               <span class="slider round"></span>
+           </label>
+        </td>
+        <td>
+               switch State is : <span id="sw1">NA</span>
+        </td>
+    </tr>
+</table>
+<hr class="new3">
+<table >
+    <tr>
+        <td width="20%">
+            <div>
+                ADC Value is : <span id="ADCValue">0</span>        
+            </div>
+        </td>
+        <td>
+              DateTime : <span id="datetime"></span>
+        </td>
+    </tr>
+</table>
 
-<div align="center"><h1>ESP32 Ethernet</h1>Página em Construção.</div>
 
+<script>
+function sendData(sw, sw_value ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById(sw).innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "controles?"+ sw + "=" + sw_value, true);
+  xhttp.send();
+}
+ 
+setInterval(function() 
+{
+   getData();
+}, 2000); 
+ 
+function getData() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("ADCValue").innerHTML = this.responseText;
+      var d = new Date();
+      document.getElementById("datetime").innerHTML = d;
+    }
+  };
+  xhttp.open("GET", "adc_read", true);
+  xhttp.send();
+}
+</script>
 </body>
 </html>
