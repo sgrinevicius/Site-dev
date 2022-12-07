@@ -29,7 +29,7 @@ function getModbusData() {
     if (this.readyState == 4 && this.status == 200) 
 	{
 	  var obj = JSON.parse(this.responseText);	  
-      document.getElementById("total_kwh").innerHTML = obj.modbus[0].total_kwh;
+          document.getElementById("total_kwh").innerHTML = obj.modbus[0].total_kwh;
 	  document.getElementById("export_kwh").innerHTML = obj.modbus[0].export_kwh;
 	  document.getElementById("import_kwh").innerHTML = obj.modbus[0].import_kwh;
 	  document.getElementById("voltage").innerHTML = obj.modbus[0].voltage;
