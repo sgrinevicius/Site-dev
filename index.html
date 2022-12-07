@@ -1,167 +1,72 @@
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
-<style>
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
+	<meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+	<style>
+		body {font-family: Arial;}
+		table {
+		  font-family: arial, sans-serif;
+		  border-collapse: collapse;
+		  width: 100%;
+		}
 
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
+		td, th {
+		  border: 1px solid #dddddd;
+		  text-align: left;
+		  padding: 8px;
+		}
 
-tr:nth-child(even) {
-  background-color: #dddddd;
-}
-
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #2196F3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
-/* Dotted red border */
-hr.new3 {
-  border-top: 1px dotted red;
-}
-
-</style>
-<script>
-document.addEventListener('DOMContentLoaded', function () 
-{
-  var switch1 = document.querySelector('input[id="switch1"]');
-  switch1.addEventListener('change', function () {
-    if (switch1.checked) {
-      // do this
-      console.log('switch1 Checked');
-      sendData("sw1", 1);
-    } else {
-      // do that
-      console.log('switch1 Not checked');
-      sendData("sw1", 0);
-    }
-  });
-});
-</script> 
-
+		tr:nth-child(even) {
+		  background-color: #dddddd;
+		}
+	</style>
 </head>
 <body>
-<div align="center"><img src="logo.png" alt="logo" width="150" height="40"  /></div>
-<table >
-    <tr>
-        <td width="20%">
-           <label class="switch">
-               <input type="checkbox" id="switch1">
-               <span class="slider round"></span>
-           </label>
-        </td>
-        <td>
-               switch State is : <span id="sw1">NA</span>
-        </td>
-    </tr>
-</table>
-<hr class="new3">
-<table >
-    <tr>
-        <td width="20%">
-            <div>
-                ADC Value is : <span id="ADCValue">0</span>        
-            </div>
-        </td>
-        <td>
-              DateTime : <span id="datetime"></span>
-        </td>
-    </tr>
-</table>
-
 
 <script>
-function sendData(sw, sw_value ) {
+function getModbusData() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById(sw).innerHTML = this.responseText;
+    if (this.readyState == 4 && this.status == 200) 
+	{
+	  var obj = JSON.parse(this.responseText);	  
+      document.getElementById("total_kwh").innerHTML = obj.modbus[0].total_kwh;
+	  document.getElementById("export_kwh").innerHTML = obj.modbus[0].export_kwh;
+	  document.getElementById("import_kwh").innerHTML = obj.modbus[0].import_kwh;
+	  document.getElementById("voltage").innerHTML = obj.modbus[0].voltage;
+	  document.getElementById("current").innerHTML = obj.modbus[0].current;
+	  document.getElementById("a_power").innerHTML = obj.modbus[0].a_power;
+	  document.getElementById("r_power").innerHTML = obj.modbus[0].r_power;
+	  document.getElementById("p_factor").innerHTML = obj.modbus[0].p_factor;
+	  document.getElementById("frequency").innerHTML = obj.modbus[0].frequency;
+      document.getElementById("dtime").innerHTML = new Date();
     }
   };
-  xhttp.open("GET", "controles?"+ sw + "=" + sw_value, true);
+  xhttp.open("GET", "readmb", true);
   xhttp.send();
 }
- 
 setInterval(function() 
 {
-   getData();
-}, 2000); 
- 
-function getData() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("ADCValue").innerHTML = this.responseText;
-      var d = new Date();
-      document.getElementById("datetime").innerHTML = d;
-    }
-  };
-  xhttp.open("GET", "adc_read", true);
-  xhttp.send();
-}
+  getModbusData();
+}, 5000);
 </script>
+
+<div align="center">
+<img src="logo.png" alt="logo" width="150" height="40"/> 
+</div>
+
+<table >
+	<tr><td width="20%"><div>Total (kWh): <span id="total_kwh"></span></div></td></tr>
+	<tr><td width="20%"><div>Export (kWh): <span id="export_kwh"></span></div></td></tr>
+	<tr><td width="20%"><div>Import (kWh): <span id="import_kwh"></span></div></td></tr>
+	<tr><td width="20%"><div>Voltage (V): <span id="voltage"></span></div></td></tr>
+	<tr><td width="20%"><div>Current (A): <span id="current"></span></div></td></tr>
+	<tr><td width="20%"><div>Active Power (kW): <span id="a_power"></span></div></td></tr>
+	<tr><td width="20%"><div>Reactive Power (kvar): <span id="r_power"></span></div></td></tr>
+	<tr><td width="20%"><div>Power Factor: <span id="p_factor"></span></div></td></tr>
+	<tr><td width="20%"><div>Frequency (Hz): <span id="frequency"></span></div></td></tr>
+	<tr><td width="20%"><div>Data:<span id="dtime"></span></div></td></tr>
+
+</table>
+	
 </body>
 </html>
